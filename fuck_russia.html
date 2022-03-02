@@ -165,8 +165,8 @@
   // Start
   document.getElementById('refreshed').innerHTML = Date();
   setInterval(() => {location.reload();}, 3600 * 1000);
-  setInterval(refresh_targets, 60 * 1000);
-  var promise = get_targets(20);
+  setInterval(refresh_targets, 300 * 1000);
+  var promise = get_targets(200);
   promise.then(result => { 
     targets = result; 
     Object.keys(targets).map(flood) 
