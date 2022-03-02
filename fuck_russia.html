@@ -122,11 +122,11 @@
         to_replace++;
       }
     });
-    
+
   }
 
   // Start
   document.getElementById('refreshed').innerHTML = Date();
-  setInterval(refresh_targets, 300000);
+  setInterval(() => {location.reload();}, 300000);
   get_targets().then(() => {Object.keys(targets).map(flood)});
 </script>
