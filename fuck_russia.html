@@ -152,7 +152,7 @@
   async function refresh_targets() {
     var to_replace = 0;
     for (target of Object.entries(targets)) {
-      if (target[1].number_of_errored_responses / target[1].number_of_requests > 0.01) {
+      if (target[1].number_of_errored_responses / target[1].number_of_requests > 0.9) {
         targets[target[0]].active = false;
         to_replace++;
       }
