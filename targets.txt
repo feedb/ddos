@@ -348,8 +348,6 @@ xmail.alexbank.ru
 ibank2.alexbank.ru
 alexbank.ru
 www.alfabank.com
-alfabank.com
-alfaradio.by
 altbb.ru
 www.andjibank.ru
 andjibank.ru
@@ -560,7 +558,6 @@ web-standin1.online.sberbank.ru
 sberkids.sberbank.ru
 kurs-mobile.sberbank.ru
 sus.sberbank.ru
-3dsec.sberbank.ru
 office.sberbank.ru
 leaked.sberbank.ru
 stdu.sberbank.ru
@@ -874,7 +871,6 @@ i25-client.belapb.by
 www.belapb.by
 belapb.by
 www.belarus24.by
-belarus24.by
 100.belarusbank.by
 acquiring.belarusbank.by
 asbchat.belarusbank.by
@@ -931,7 +927,6 @@ belinvestbank.by
 bellegprom.by
 adv.belmarket.by
 www.belmarket.by
-belmarket.by
 abon.belneftekhim.by
 docs.belneftekhim.by
 gw.belneftekhim.by
@@ -983,8 +978,6 @@ atom.belta.by
 eng.belta.by
 tv.belta.by
 vector.belta.by
-belta.by
-bezformata.com
 www.bgp.by
 belproduct.bgp.by
 www.belproduct.bgp.by
@@ -1495,7 +1488,6 @@ autodiscover.cea.gov.ru
 mail.ac.gov.ru
 uslugi.tambov.gov.ru
 nap.rkn.gov.ru
-gov.ru
 ctv.by
 en.eadaily.com
 img1.eadaily.com
@@ -1774,7 +1766,6 @@ new.gazeta.ru
 pg.gazeta.ru
 static.gazeta.ru
 www.gazeta.ru
-gazeta.ru
 mob2.gazprombank.ru
 api.gazprombank.ru
 ir.bs2.gazprombank.ru
@@ -1863,7 +1854,6 @@ spb-school.gazprom.ru
 institute.gazprom.ru
 zakupki.gazprom.ru
 hrd.gazprom.ru
-asup-ph6.gazprom.ru
 sdo.gazprom.ru
 www.sdo.gazprom.ru
 lk.kazan-tr.gazprom.ru
@@ -1871,9 +1861,7 @@ www.institute.gazprom.ru
 constructor.gazprom.ru
 gdo.gazprom.ru
 postmaster@zakupki.gazprom.ru
-postmaster@hrd.gazprom.ru
 postmaster@asup-ph6.gazprom.ru
-gazprom.ru
 pos.gosuslugi.ru
 read.mail.gosuslugi.ru
 mail.gosuslugi.ru
@@ -1895,11 +1883,8 @@ www.gosuslugi.ru
 search.gosuslugi.ru
 gepsdemo.gosuslugi.ru
 siademo1.gosuslugi.ru
-gosuslugi.ru
 government.by
-government.ru
 mail.grodnonews.by
-grodnonews.by
 post2.interfax.ru
 www.interfax.ru
 cherkizovo.interfax.ru
@@ -4344,7 +4329,6 @@ www.25.sibur.ru
 srm.sibur.ru
 b2b-rni.sibur.ru
 eshop.sibur.ru
-b2b.sibur.ru
 coach.sibur.ru
 aghk.sibur.ru
 career.sibur.ru
@@ -5193,3 +5177,26 @@ http://185.17.9.187
 http://92.53.71.179
 https://ca.vks.rosguard.gov.ru
 http://109.252.233.150:51
+Transneft.ru
+Tektorg.ru
+Rosneft.com
+Lukoil.com
+b2b.sibur.ru
+Onlinecontract.ru
+Eurochemgroup.com
+Uralchem.com
+Tatneft.ru
+Nlmk.com
+Acron.ru
+aaa-srt-apps.lukoil.com
+https://iz.ru/
+https://www.kommersant.ru/
+https://rg.ru/
+https://www.kp.ru/
+https://www.vedomosti.ru/
+https://www.mk.ru/
+https://novayagazeta.ru/
+https://www.pnp.ru/
+https://aif.ru/
+https://www.rbc.ru/
+https://vesti.ru/
